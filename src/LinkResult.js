@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const LinkResult = ({ inputValue }) => {
   const [urlData, setUrlData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleCopy = (id) => {
     setUrlData(prevUrlData => {
@@ -24,6 +25,7 @@ const LinkResult = ({ inputValue }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!inputValue) return;
+      setLoading(true);
       try {
         const response = await axios.get(`http://tinyurl.com/api-create.php?url=${inputValue}`);
         const shortUrl = response.data;
@@ -31,6 +33,8 @@ const LinkResult = ({ inputValue }) => {
         setUrlData(prevUrlData => [...prevUrlData, { id, url: shortUrl, copyCount: 0 }]);
       } catch (err) {
         console.error("Error fetching URL:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -39,6 +43,7 @@ const LinkResult = ({ inputValue }) => {
 
   return (
     <>
+      {loading && <p>Loading...</p>}
       {urlData.map((item) => (
         <div className="result" key={item.id}>
           <p>{item.url}</p>
